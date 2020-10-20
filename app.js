@@ -9,10 +9,80 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
+const teamArray = []
+
+function init() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "role",
+            message: "What type of employee do you want to add?",
+            choices: ["Manager", "Engineer", "Intern", "FINISHED"]
+
+        }
 
 
+    ])
+        .then(function (response) {
+            switch (response.role) {
+                case "Manager":
+                    addManager();
+                    break;
+
+                case "Engineer":
+                    addEngineer();
+                    break;
+                case "Intern":
+                    addIntern();
+                    break;
+                default:
+                    createTeam();
+            }
+        })
+
+}
+function addManager() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "managerName",
+            message: "What is your manager's name?",
+
+        },
+        {
+            type: "input",
+            name: "managerId",
+            message: "What is your manager's id?",
+        },
+        {
+            type: "input",
+            name: "managerEmail",
+            message: "What is your email?",
+        },
+        {
+            type: "input",
+            name: "managerOfficeNumber",
+            message: "What is your office number?",
+        }
+    ]).then (function(response) {
+        const manager = new Manager(response.managerName, response.managerId, response.managerEmail, response.managerOfficeNumber);
+        teamArray.push(manager);
+        init()
+    })
+}
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+
+function createTeam(){
+    // check to see if output directory exists, if not create it.
+    if (!fs.existsSync(OUTPUT_DIR)){
+        fs.mkdirSync(OUTPUT_DIR);
+    }
+    fs.writeFileSync(outputPath, render(teamArray), "utf8")
+    
+    
+}
+init()
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
